@@ -1,0 +1,124 @@
+#cloud-config
+autoinstall:
+  apt:
+    disable_components: []
+    fallback: abort
+    geoip: false
+    mirror-selection:
+      primary:
+      - arches: &id001
+        - amd64
+        - i386
+        uri: http://archive.ubuntu.com/ubuntu/
+      - arches: &id002
+        - s390x
+        - arm64
+        - armhf
+        - powerpc
+        - ppc64el
+        - riscv64
+        uri: http://ports.ubuntu.com/ubuntu-ports
+    preserve_sources_list: false
+    security:
+    - arches: *id001
+      uri: http://security.ubuntu.com/ubuntu/
+    - arches: *id002
+      uri: http://ports.ubuntu.com/ubuntu-ports
+  codecs:
+    install: false
+  drivers:
+    install: true
+  identity:
+    hostname: ubuntu
+    password: "$6$dFMUTo4Fh6SI0rCY$mVYDyK2B/XFKJDZJFvF/WJKlf4Ba/hpaSFrGPJRlHHTRrYMiA1IL4gyhjMHmzsI1dVAN41fh9UfTFBjINGCj80"
+    realname: nebula
+    username: nebula
+  kernel:
+    package: linux-generic
+  keyboard:
+    layout: us
+    toggle: null
+    variant: ''
+  locale: en_US.UTF-8
+  network:
+    version: 2
+    ethernets:
+      dynamic0:
+        match:
+          name: mgmtenp*
+        dhcp4: false
+        addresses:
+          - 0.0.0.0/32  # placeholder IP
+        routes: []
+        nameservers:
+          addresses: []
+      dynamic1:
+        match:
+          name: mgmtenx*
+        dhcp4: false
+        addresses:
+          - 0.0.0.0/32  # placeholder IP
+        routes: []
+        nameservers:
+          addresses: []
+      dynamic2:
+        match:
+          name: mgmtens*
+        dhcp4: false
+        addresses:
+          - 0.0.0.0/32  # placeholder IP
+        routes: []
+        nameservers:
+          addresses: []
+      dynamic3:
+        match:
+          name: mgmteno*
+        dhcp4: false
+        addresses:
+          - 0.0.0.0/32  # placeholder IP
+        routes: []
+        nameservers:
+          addresses: []
+      fallback:
+        match:
+          name: "*"
+        dhcp4: true
+  packages:
+    - qemu-guest-agent
+    - curl
+    - git
+    - python3-full
+    - python3-pip
+    - pipx
+    - nfs-common
+    - nano
+    - iputils-ping
+    - yq
+    - ansible
+  source:
+    id: ubuntu-server-minimal
+    search_drivers: true
+  ssh:
+    allow-pw: true
+    authorized-keys: [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINONEC4mkiAgXK3E1oNcPp5t265i9uK8M1nLhRPEs5N7 packer@build"
+    ]
+    install-server: true
+  storage:
+    layout:
+      name: direct
+      sizing-policy: all
+  updates: security
+  user-data:
+    users:
+    - name: nebula
+      shell: /bin/bash
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      lock_passwd: false
+      ssh_authorized_keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINONEC4mkiAgXK3E1oNcPp5t265i9uK8M1nLhRPEs5N7 packer@build
+    runcmd:
+      - |
+        systemctl enable ssh
+        systemctl start ssh
+  version: 1

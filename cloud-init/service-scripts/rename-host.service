@@ -1,0 +1,13 @@
+[Unit]
+Description=Rename VM based on manufacturer with -nebula suffix
+After=network-pre.target
+Before=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/rename-host.sh
+RemainAfterExit=true
+TimeoutStartSec=60
+
+[Install]
+WantedBy=multi-user.target

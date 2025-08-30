@@ -1,0 +1,14 @@
+[Unit]
+Description=Assign dynamic static IP from list
+After=network-online.target
+Wants=network-online.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/assign-ip.sh
+RemainAfterExit=true
+TimeoutStartSec=60
+
+[Install]
+WantedBy=sysinit.target

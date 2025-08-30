@@ -14,3 +14,7 @@ crash.log
 
 # For built boxes
 *.box
+output/
+source-image/
+*.iso
+*.qcow2

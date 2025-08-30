@@ -1,0 +1,68 @@
+---
+all:
+  vars:
+    ansible_user: root
+    one_version: '7.0'
+    one_pass: nebula
+
+    # Detect first UP interface starting with 'mgmt'
+    physdev_interface: >-
+      {{
+        ansible_interfaces
+        | select('match', '^mgmt')
+        | select('in', ansible_facts | json_query('ansible_interfaces_status[?state==`UP`].interface'))
+        | list
+        | first
+      }}
+
+    # Fail if no usable mgmt interface is found
+    validate_physdev: >-
+      {{
+        physdev_interface is not defined or physdev_interface == ""
+      }}
+
+    vn:
+      service:
+        managed: true
+        template:
+          VN_MAD: vxlan
+          BRIDGE: br0
+          PHYDEV: "{{ physdev_interface }}"
+          AUTOMATIC_VLAN_ID: YES
+          AR:
+            TYPE: IP4
+            IP: 10.0.0.0
+            SIZE: 16
+          NETWORK_ADDRESS: 10.0.0.0
+          NETWORK_MASK: 255.255.0.0
+          GATEWAY: 10.0.0.1
+          DNS: 1.1.1.1
+
+    ds:
+      mode: shared
+
+    fstab:
+      - src: "192.168.50.25:/mnt/OpenNebula/NebulaStorage"
+        dst: "/mnt/NebulaStorage-nfs"
+        type: "nfs"
+        opts: "defaults,vers=3"
+        dump: 0
+        passno: 0
+
+frontend:
+  hosts:
+    f1:
+      ansible_host: 192.168.50.233
+
+node:
+  hosts:
+    n1:
+      ansible_host: 192.168.50.226
+    n2:
+      ansible_host: 192.168.50.227
+    n3:
+      ansible_host: 192.168.50.229
+    n4:
+      ansible_host: 192.168.50.230
+    n5:
+      ansible_host: 192.168.50.231
